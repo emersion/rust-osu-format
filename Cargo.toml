@@ -2,3 +2,6 @@
 name = "osu_format"
 version = "0.1.0"
 authors = ["emersion <contact@emersion.fr>"]
+repository = "https://github.com/emersion/rust-osu-format"
+documentation = "https://docs.rs/osu_format"
+license = "MIT"
