@@ -1,6 +1,7 @@
 [package]
 name = "osu_format"
 version = "0.1.0"
+description = "A Rust library to parse .osu files"
 authors = ["emersion <contact@emersion.fr>"]
 repository = "https://github.com/emersion/rust-osu-format"
 documentation = "https://docs.rs/osu_format"
