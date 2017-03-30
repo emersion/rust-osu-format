@@ -101,7 +101,6 @@ pub struct HitObjectBase {
 	pub time: u32,
 	pub object_type: u32, // bitmap
 	pub hit_sound: u32,
-	pub addition: u32, // ?
 }
 
 #[derive(Debug)]
@@ -337,7 +336,6 @@ impl<U> Parser<U> where U: BufRead {
 				time: u32::from_str(values[2]).unwrap(),
 				object_type: u32::from_str(values[3]).unwrap(),
 				hit_sound: u32::from_str(values[4]).unwrap(),
-				addition: 0,
 			};
 
 			// TODO
