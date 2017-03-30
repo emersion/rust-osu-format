@@ -1,0 +1,4 @@
+[package]
+name = "osu_format"
+version = "0.1.0"
+authors = ["emersion <contact@emersion.fr>"]
