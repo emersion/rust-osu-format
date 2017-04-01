@@ -89,7 +89,7 @@ pub struct TimingPoint {
 	pub meter: u32,
 	pub sample_type: u32,
 	pub sample_set: u32,
-	pub volume: u32,
+	pub volume: u32, // Between 0 and 100
 	pub kiai_mode: bool,
 	pub inherited: bool,
 }
