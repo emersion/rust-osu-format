@@ -82,7 +82,7 @@ pub struct BeatmapDifficulty {
 	pub slider_tick_rate: f32,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TimingPoint {
 	pub offset: u32,
 	pub milliseconds_per_beat: f32,
@@ -92,6 +92,19 @@ pub struct TimingPoint {
 	pub volume: u32,
 	pub kiai_mode: bool,
 	pub inherited: bool,
+}
+
+impl TimingPoint {
+	pub fn inherit(&self, prev: &TimingPoint) -> TimingPoint {
+		let mut point = self.clone();
+		if !self.inherited {
+			return point
+		}
+
+		point.milliseconds_per_beat = prev.milliseconds_per_beat + self.milliseconds_per_beat;
+		point.inherited = prev.inherited;
+		return point;
+	}
 }
 
 #[derive(Debug, Default)]
@@ -314,8 +327,8 @@ impl<U> Parser<U> where U: BufRead {
 				sample_type: u32::from_str(values[3]).unwrap(),
 				sample_set: u32::from_str(values[4]).unwrap(),
 				volume: u32::from_str(values[5]).unwrap(),
-				kiai_mode: parse_bool(values[6]).unwrap(),
-				inherited: parse_bool(values[7]).unwrap(),
+				inherited: parse_bool(values[6]).unwrap(),
+				kiai_mode: parse_bool(values[7]).unwrap(),
 			});
 		}
 
