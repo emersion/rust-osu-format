@@ -86,10 +86,10 @@ pub struct BeatmapDifficulty {
 pub struct TimingPoint {
 	pub offset: u32,
 	pub milliseconds_per_beat: f32,
-	pub meter: u32,
+	pub meter: u32, // Number of beats in a measure
 	pub sample_type: u32,
 	pub sample_set: u32,
-	pub volume: u32, // Between 0 and 100
+	pub volume: u32, // Hit sound volume, 0 to 100
 	pub kiai_mode: bool,
 	pub inherited: bool,
 }
@@ -109,10 +109,10 @@ impl TimingPoint {
 
 #[derive(Debug, Default)]
 pub struct HitObjectBase {
-	pub x: u32,
-	pub y: u32,
-	pub time: u32,
-	pub object_type: u32, // bitmap
+	pub x: u32, // 0 to 512
+	pub y: u32, // 0 to 384
+	pub time: u32, // In ms
+	pub object_type: u32, // Bitmap
 	pub hit_sound: u32,
 }
 
@@ -168,8 +168,8 @@ pub struct Beatmap {
 
 fn parse_bool(s: &str) -> Result<bool, &'static str> {
 	match s {
-		"0" => Ok(true),
-		"1" => Ok(false),
+		"0" => Ok(false),
+		"1" => Ok(true),
 		_ => Err("malformed bool"),
 	}
 }
@@ -327,7 +327,7 @@ impl<U> Parser<U> where U: BufRead {
 				sample_type: u32::from_str(values[3]).unwrap(),
 				sample_set: u32::from_str(values[4]).unwrap(),
 				volume: u32::from_str(values[5]).unwrap(),
-				inherited: parse_bool(values[6]).unwrap(),
+				inherited: !parse_bool(values[6]).unwrap(),
 				kiai_mode: parse_bool(values[7]).unwrap(),
 			});
 		}
