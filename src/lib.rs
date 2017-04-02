@@ -265,6 +265,7 @@ impl<U> Parser<U> where U: BufRead {
 	fn parse_section(&mut self, name: String, beatmap: &mut Beatmap) -> Result<(), &'static str> {
 		match name.as_ref() {
 			"General" => self.parse_general(&mut beatmap.general),
+			"Metadata" => self.parse_metadata(&mut beatmap.metadata),
 			"Difficulty" => self.parse_difficulty(&mut beatmap.difficulty),
 			"TimingPoints" => self.parse_timing_points(&mut beatmap.timing_points),
 			"HitObjects" => self.parse_hit_objects(&mut beatmap.hit_objects),
@@ -288,6 +289,27 @@ impl<U> Parser<U> where U: BufRead {
 				"Mode" => section.mode = BeatmapMode::from_str(&v).unwrap(),
 				"LetterboxInBreaks" => section.letterbox_in_breaks = parse_bool(&v).unwrap(),
 				"WidescreenStoryboard" => section.widescreen_storyboard = parse_bool(&v).unwrap(),
+				_ => (),
+			}
+		}
+
+		Ok(())
+	}
+
+	fn parse_metadata(&mut self, section: &mut BeatmapMetadata) -> Result<(), &'static str> {
+		while let Some(res) = self.read_key_value() {
+			let (k, v) = res?;
+			match k.as_ref() {
+				"Title" => section.title = v,
+				"TitleUnicode" => section.title_unicode = v,
+				"Artist" => section.artist = v,
+				"ArtistUnicode" => section.artist_unicode = v,
+				"Creator" => section.creator = v,
+				"Version" => section.version = v,
+				"Source" => section.source = v,
+				"Tags" => section.tags = v.split(' ').map(|s| s.to_string()).collect(),
+				"BeatmapID" => section.beatmap_id = u64::from_str(&v).unwrap(),
+				"BeatmapSetID" => section.beatmap_set_id = u64::from_str(&v).unwrap(),
 				_ => (),
 			}
 		}
