@@ -3,8 +3,6 @@ use std::io::BufRead;
 use std::io::Lines;
 use std::str::FromStr;
 
-// https://osu.ppy.sh/wiki/Osu_(file_format)
-
 #[derive(Debug)]
 pub enum BeatmapMode {
 	Standard = 0,
@@ -80,6 +78,13 @@ pub struct BeatmapDifficulty {
 	pub approach_rate: f32,
 	pub slider_multiplier: f32,
 	pub slider_tick_rate: f32,
+}
+
+#[derive(Debug)]
+pub enum Event {
+	BackgroundMedia{
+		filepath: String,
+	},
 }
 
 #[derive(Debug, Default, Clone)]
@@ -162,6 +167,7 @@ pub struct Beatmap {
 	pub general: BeatmapGeneral,
 	pub metadata: BeatmapMetadata,
 	pub difficulty: BeatmapDifficulty,
+	pub events: Vec<Event>,
 	pub timing_points: Vec<TimingPoint>,
 	pub hit_objects: Vec<HitObject>,
 }
@@ -267,6 +273,7 @@ impl<U> Parser<U> where U: BufRead {
 			"General" => self.parse_general(&mut beatmap.general),
 			"Metadata" => self.parse_metadata(&mut beatmap.metadata),
 			"Difficulty" => self.parse_difficulty(&mut beatmap.difficulty),
+			"Events" => self.parse_events(&mut beatmap.events),
 			"TimingPoints" => self.parse_timing_points(&mut beatmap.timing_points),
 			"HitObjects" => self.parse_hit_objects(&mut beatmap.hit_objects),
 			_ => {
@@ -329,6 +336,28 @@ impl<U> Parser<U> where U: BufRead {
 				"SliderTickRate" => section.slider_tick_rate = f32::from_str(&v).unwrap(),
 				_ => (),
 			}
+		}
+
+		Ok(())
+	}
+
+	fn parse_events(&mut self, section: &mut Vec<Event>) -> Result<(), &'static str> {
+		while let Some(res) = self.read_line() {
+			let l = res?;
+			let values: Vec<&str> = l.split(',').collect();
+			if values[0].starts_with(' ') || values[0].starts_with('_') {
+				continue;
+			}
+			if values[0] == "Sprite" || values[0] == "Animation" {
+				continue;
+			}
+			if values.len() != 5 {
+				continue;
+			}
+
+			section.push(Event::BackgroundMedia{
+				filepath: values[3].trim_matches('"').to_string(), // TODO: proper unescaping
+			});
 		}
 
 		Ok(())
