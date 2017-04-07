@@ -402,7 +402,7 @@ impl<U> Parser<U> where U: BufRead {
 					}
 
 					Event::BackgroundMedia{
-						filepath: values[3].trim_matches('"').to_string(), // TODO: proper unescaping
+						filepath: values[2].trim_matches('"').to_string(), // TODO: proper unescaping
 					}
 				},
 			};
