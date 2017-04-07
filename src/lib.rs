@@ -85,6 +85,23 @@ pub enum Event {
 	BackgroundMedia{
 		filepath: String,
 	},
+	Sprite{
+		layer: String,
+		origin: String,
+		filepath: String,
+		x: u32,
+		y: u32,
+	},
+	Animation{
+		layer: String,
+		origin: String,
+		filepath: String,
+		x: u32,
+		y: u32,
+		frame_count: u32,
+		frame_delay: u32,
+		loop_type: String,
+	},
 }
 
 #[derive(Debug, Default, Clone)]
@@ -348,16 +365,49 @@ impl<U> Parser<U> where U: BufRead {
 			if values[0].starts_with(' ') || values[0].starts_with('_') {
 				continue;
 			}
-			if values[0] == "Sprite" || values[0] == "Animation" {
-				continue;
-			}
-			if values.len() != 5 {
-				continue;
-			}
 
-			section.push(Event::BackgroundMedia{
-				filepath: values[3].trim_matches('"').to_string(), // TODO: proper unescaping
-			});
+			let event = match values[0] {
+				"Sprite" => {
+					if values.len() != 6 {
+						continue;
+					}
+
+					Event::Sprite{
+						layer: values[1].to_string(),
+						origin: values[2].to_string(),
+						filepath: values[3].trim_matches('"').to_string(), // TODO: proper unescaping
+						x: u32::from_str(values[4]).unwrap(),
+						y: u32::from_str(values[5]).unwrap(),
+					}
+				},
+				"Animation" => {
+					if values.len() != 9 {
+						continue;
+					}
+
+					Event::Animation{
+						layer: values[1].to_string(),
+						origin: values[2].to_string(),
+						filepath: values[3].trim_matches('"').to_string(), // TODO: proper unescaping
+						x: u32::from_str(values[4]).unwrap(),
+						y: u32::from_str(values[5]).unwrap(),
+						frame_count: u32::from_str(values[6]).unwrap(),
+						frame_delay: u32::from_str(values[7]).unwrap(),
+						loop_type: values[8].to_string(),
+					}
+				},
+				_ => {
+					if values.len() != 5 {
+						continue;
+					}
+
+					Event::BackgroundMedia{
+						filepath: values[3].trim_matches('"').to_string(), // TODO: proper unescaping
+					}
+				},
+			};
+
+			section.push(event);
 		}
 
 		Ok(())
